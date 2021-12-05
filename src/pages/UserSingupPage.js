@@ -1,10 +1,24 @@
 import React from "react";
+<<<<<<< HEAD
 import {signup,changeLanguage} from '../api/apiCalls';
 import Input from '../components/Input';
 import {withTranslation} from 'react-i18next';
+=======
+import { signup } from "../api/apiCalls";
+import Input from "../components/Input";
+>>>>>>> 832d93cdec5afdedaf3fe309d627aecc0d9f379a
 
 class UserSignupPage extends React.Component {
+  state = {
+    username: null,
+    displayName: null,
+    password: null,
+    passwordRepeat: null,
+    pendingApiCall: false,
+    errors: {},
+  };
 
+<<<<<<< HEAD
     state = {
         username: null,
         displayName: null,
@@ -34,29 +48,41 @@ class UserSignupPage extends React.Component {
             [name]: value, errors
         })
     };
+=======
+  onChange = (event) => {
+    const { name, value } = event.target;
+    const errors = { ...this.state.errors };
+    errors[name] = undefined;
+>>>>>>> 832d93cdec5afdedaf3fe309d627aecc0d9f379a
 
-    onClickSignup = async event => {
-        event.preventDefault();
+    if (name === "password" || name === "passwordRepeat") {
+      if (name === "password" && value !== this.state.passwordRepeat) {
+        errors.passwordRepeat = "Password mismatch";
+      } else if (name === "passwordRepeat" && value !== this.state.password) {
+        errors.passwordRepeat = "Password mismatch";
+      } else {
+        errors.passwordRepeat = undefined;
+      }
+    }
+    this.setState({
+      [name]: value,
+      errors,
+    });
+  };
 
-        const {username, displayName, password} = this.state;
+  onClickSignup = async (event) => {
+    event.preventDefault();
 
-        const body = {
-            username,
-            displayName,
-            password
-        };
-        this.setState({pendingApiCall: true});
+    const { username, displayName, password } = this.state;
 
-        try {
-            const response = await signup(body);
-        } catch (error) {
-            if (error.response.data.validationErrors) {
-                this.setState({errors: error.response.data.validationErrors});
-            }
-        }
-        this.setState({pendingApiCall: false});
+    const body = {
+      username,
+      displayName,
+      password,
     };
+    this.setState({ pendingApiCall: true });
 
+<<<<<<< HEAD
     onChangeLanguage = language => {
         const {i18n} = this.props;
         i18n.changeLanguage(language);
@@ -90,12 +116,74 @@ class UserSignupPage extends React.Component {
                     </div>
                 </form>
             </div>
-
-
-        )
+=======
+    try {
+      const response = await signup(body);
+    } catch (error) {
+      if (error.response.data.validationErrors) {
+        this.setState({ errors: error.response.data.validationErrors });
+      }
     }
+    this.setState({ pendingApiCall: false });
+  };
+>>>>>>> 832d93cdec5afdedaf3fe309d627aecc0d9f379a
+
+  render() {
+    const { pendingApiCall, errors } = this.state;
+    const { username, displayName, password, passwordRepeat } = errors;
+
+    return (
+      <div className="container">
+        <form>
+          <h1 className="text-center">Sign Up</h1>
+          <Input
+            name="username"
+            label="Username"
+            error={username}
+            onChange={this.onChange}
+          />
+          <Input
+            name="displayName"
+            label="Display Name"
+            error={displayName}
+            onChange={this.onChange}
+          />
+          <Input
+            name="password"
+            label="Password"
+            error={password}
+            onChange={this.onChange}
+            type="password"
+          />
+          <Input
+            name="passwordRepeat"
+            label="Password Repeat"
+            error={passwordRepeat}
+            onChange={this.onChange}
+            type="password"
+          />
+          <div className="text-center">
+            <button
+              className="btn btn-primary"
+              onClick={this.onClickSignup}
+              disabled={pendingApiCall || passwordRepeat !== undefined}
+            >
+              {pendingApiCall && (
+                <span className="spinner-border spinner-border-sm" />
+              )}{" "}
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 }
 
+<<<<<<< HEAD
 const UserSignupPageWithTranslation = withTranslation()(UserSignupPage);
 
 export default UserSignupPageWithTranslation;
+=======
+export default UserSignupPage;
+>>>>>>> 832d93cdec5afdedaf3fe309d627aecc0d9f379a
