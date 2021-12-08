@@ -10,8 +10,7 @@ class UserSignupPage extends React.Component {
         displayName: null,
         password: null,
         passwordRepeat: null,
-        pendingApiCall: false,
-        errors: {},
+        errors: {}
     };
 
     onChange = event => {

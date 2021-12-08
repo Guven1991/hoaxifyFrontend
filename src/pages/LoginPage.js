@@ -9,8 +9,7 @@ class LoginPage extends Component {
     state = {
         username: null,
         password: null,
-        error: null,
-        pendingApiCall: false
+        error: null
     };
 
 
