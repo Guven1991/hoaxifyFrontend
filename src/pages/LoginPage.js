@@ -4,11 +4,14 @@ import {withTranslation} from 'react-i18next';
 import {login} from '../api/apiCalls';
 import ButtonWithProgress from "../components/ButtonWithProgress";
 import {withApiProgress} from "../shared/ApiProgress";
-import {Authentication} from "../shared/AuthenticationContext";
+import {connect} from "react-redux";
+import {loginSuccess} from "../redux/authActions";
+
+// import {Authentication} from "../shared/AuthenticationContext";
 
 
 class LoginPage extends Component {
-    static contextType = Authentication;
+    // static contextType = Authentication;
 
     state = {
         username: null,
@@ -28,13 +31,12 @@ class LoginPage extends Component {
     onClickLogin = async event => {
         event.preventDefault();
         const {username, password} = this.state;
-        const {onLoginSuccess} =this.context;
         const creds = {
             username,
             password
         };
 
-        const { push } = this.props.history;
+        const {push} = this.props.history;
 
         this.setState({
             error: null
@@ -48,7 +50,7 @@ class LoginPage extends Component {
                 password
             };
 
-            onLoginSuccess(authState);
+            this.props.onLoginSuccess(authState);
         } catch (apiError) {
             this.setState({
                 error: apiError.response.data.message
@@ -57,10 +59,10 @@ class LoginPage extends Component {
 
     };
 
-render() {
-    const {username, password, error} = this.state;
-    const {t, pendingApiCall} = this.props;
-    const buttonEnabled = username && password;
+    render() {
+        const {username, password, error} = this.state;
+        const {t, pendingApiCall} = this.props;
+        const buttonEnabled = username && password;
 
         return (
             <div className="container">
@@ -85,4 +87,10 @@ render() {
 }
 
 const LoginPageWithTranslation = withTranslation()(LoginPage);
-export default withApiProgress(LoginPageWithTranslation, '/api/1.0/auth');
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onLoginSuccess: (authState) => dispatch(loginSuccess(authState))
+        };
+    }
+
+export default connect(null, mapDispatchToProps)(withApiProgress(LoginPageWithTranslation, '/api/1.0/auth'));

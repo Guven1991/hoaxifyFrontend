@@ -5,14 +5,19 @@ import './bootstrap-override.scss';
 import App from './container/App';
 import reportWebVitals from './reportWebVitals';
 import './i18n';
-import AuthenticationContext from "./shared/AuthenticationContext";
+// import AuthenticationContext from "./shared/AuthenticationContext";
+import {Provider} from "react-redux";
+import {createStore} from "redux";
+import configureStore from "./redux/congigureStore";
 
+
+const store = configureStore();
 
 ReactDOM.render(
     <React.StrictMode>
-        <AuthenticationContext>
-            <App/>
-        </AuthenticationContext>
+        <Provider store={store}>
+            <App/>,
+        </Provider>
     </React.StrictMode>,
     document.getElementById('root'));
 
