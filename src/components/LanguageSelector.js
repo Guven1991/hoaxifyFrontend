@@ -1,14 +1,16 @@
 import React from "react";
 import { changeLanguage } from "../api/apiCalls";
-import { withTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import turkishFlag from "../pictures/turkish.svg";
 import americanAMK from "../pictures/usa.svg";
+
 const LanguageSelector = (props) => {
+const {i18n} = useTranslation();
   const onChangeLanguage = (language) => {
-    const { i18n } = props;
     i18n.changeLanguage(language);
     changeLanguage(language);
   };
+
   return (
     <div className="container">
       <img
@@ -31,4 +33,4 @@ const LanguageSelector = (props) => {
   );
 };
 
-export default withTranslation()(LanguageSelector);
+export default LanguageSelector;
