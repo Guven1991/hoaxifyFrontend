@@ -22,6 +22,7 @@ export const loginHandler = (credentials) => {
             password: credentials.password
         };
         dispatch(loginSuccess(authState));
+
         return response;
     }
 };
