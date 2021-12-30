@@ -36,7 +36,7 @@ export const useApiProgress = (apiPath) => {
         return function unmount(){
             unregisterInterceptor();
         }
-    }, []);
+    }, [apiPath]);
 
     return pendingApiCall;
 }
