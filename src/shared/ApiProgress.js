@@ -1,30 +1,33 @@
 import {useEffect, useState} from 'react';
 import axios from "axios";
 
-export const useApiProgress = (apiPath) => {
+export const useApiProgress = (apiMethod, apiPath) => {
     const [pendingApiCall, setPendingApiCall] = useState(false);
 
     useEffect(() => {
-        let requestInterceptor, responseInterceptor ;
+        let requestInterceptor, responseInterceptor;
 
-        const updateApiCallFor = (url, inProgress) => {
-            if (url.startsWith(apiPath)) {
+        const updateApiCallFor = (method, url, inProgress) => {
+            if (url.startsWith(apiPath) && method === apiMethod) {
                 setPendingApiCall(inProgress);
             }
-        }
+        };
         const registerInterceptor = () => {
             requestInterceptor = axios.interceptors.request.use((request) => {
-                console.log('running request interceptor', apiPath);
-                updateApiCallFor(request.url, true);
+                const {url, method} = request;
+                updateApiCallFor(method, url, true);
                 return request;
             });
-            responseInterceptor = axios.interceptors.response.use((response) => {
-                updateApiCallFor(response.config.url, false);
-                return response;
-            }, (error) => {
-                updateApiCallFor(error.config.url, false);
-                throw error;
-            });
+            responseInterceptor = axios.interceptors.response.use(
+                (response) => {
+                    const {url, method} = response.config;
+                    updateApiCallFor(method, url, false);
+                    return response;
+                }, (error) => {
+                    const {url, method} = error.config;
+                    updateApiCallFor(method, url, false);
+                    throw error;
+                });
         };
 
         const unregisterInterceptor = () => {
@@ -33,10 +36,10 @@ export const useApiProgress = (apiPath) => {
         };
         registerInterceptor();
 
-        return function unmount(){
+        return function unmount() {
             unregisterInterceptor();
         }
-    }, [apiPath]);
+    }, [apiPath, apiMethod]);
 
     return pendingApiCall;
 }
