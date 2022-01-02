@@ -15,9 +15,10 @@ const ProfileCard = (props) => {
     const {username: loggedInUsername} = useSelector((store) => ({username: store.username}));
     const routeParams = useParams();
     const pathUsername = routeParams.username;
-    const [user, setUser] =useState({});
+    const [user, setUser] = useState({});
     const [editable, setEditable] = useState(false);
     const [newImage, setNewImage] = useState();
+    const [validationErrors, setValidationErrors] = useState({});
 
     useEffect(() => {
         setUser(props.user)
@@ -31,19 +32,34 @@ const ProfileCard = (props) => {
     const {t} = useTranslation();
 
     useEffect(() => {
-        if(!inEditMode){
+        if (!inEditMode) {
             setUpdateDisplayName(undefined);
             setNewImage(undefined);
-        }else{
+        } else {
             setUpdateDisplayName(displayName);
         }
 
     }, [inEditMode, displayName]);
 
-    const onClickSave = async () => {
+    useEffect(() => {
+        setValidationErrors((previousValidationsErrors) => ({
+                ...previousValidationsErrors,
+                displayName: undefined
+            })
+        );
+    }, [updateDisplayName]);
 
+    useEffect(() => {
+        setValidationErrors((previousValidationsErrors) => ({
+                ...previousValidationsErrors,
+                image: undefined
+            })
+        );
+    }, [newImage])
+
+    const onClickSave = async () => {
         let image;
-        if(newImage){
+        if (newImage) {
             image = newImage.split(',')[1]
         }
 
@@ -51,16 +67,17 @@ const ProfileCard = (props) => {
             displayName: updateDisplayName,
             image: image
         };
-        try{
+        try {
             const response = await updateUser(username, body);
             setInEditMode(false);
             setUser(response.data);
-        }catch (error) {
+        } catch (error) {
+            setValidationErrors(error.response.data.validationErrors);
         }
-    }
+    };
 
     const onChangeFile = (event) => {
-        if(event.target.files.length < 1){
+        if (event.target.files.length < 1) {
             return;
         }
         const file = event.target.files[0];
@@ -73,7 +90,7 @@ const ProfileCard = (props) => {
 
     const pendingApiCall = useApiProgress('put', '/api/1.0/users' + username);
 
-
+    const {displayName: displayNameError, image: imageError} = validationErrors;
 
     return <div className="card text-center">
         <div className="card-header">
@@ -93,9 +110,9 @@ const ProfileCard = (props) => {
                     </h3>
                     {editable && (
                         <button className="btn btn-success d-inline-flex" onClick={() => setInEditMode(true)}>
-                        <span className="material-icons">edit</span>
-                        {t('Edit')}
-                    </button>
+                            <span className="material-icons">edit</span>
+                            {t('Edit')}
+                        </button>
                     )}
                 </>
             )}
@@ -104,21 +121,24 @@ const ProfileCard = (props) => {
                     <Input
                         label={t('Change Display Name')}
                         defaultValue={displayName}
-                        onChange={(event) => {setUpdateDisplayName(event.target.value)}}
+                        onChange={(event) => {
+                            setUpdateDisplayName(event.target.value);
+                        }}
+                        error={displayNameError}
                     />
-                    <input type="file" onChange={onChangeFile}/>
+                    <Input type="file" onChange={onChangeFile} error={imageError}/>
                     <div>
                         <ButtonWithProgress
-                         className="btn btn-primary d-inline-flex"
-                         onClick={onClickSave}
-                         disabled={pendingApiCall}
-                         pendingApiCall={pendingApiCall}
-                         text ={
-                             <>
-                                 <span className="material-icons">save</span>
-                                 {t('Save')}
-                             </>
-                         }
+                            className="btn btn-primary d-inline-flex"
+                            onClick={onClickSave}
+                            disabled={pendingApiCall}
+                            pendingApiCall={pendingApiCall}
+                            text={
+                                <>
+                                    <span className="material-icons">save</span>
+                                    {t('Save')}
+                                </>
+                            }
                         />
                         <button
                             className="btn btn-light d-inline-flex ml-1"
