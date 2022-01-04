@@ -48,7 +48,7 @@ const HoaxSubmit = () => {
 
     return (
         <div className="card p-1 flex-row">
-            <ProfileImageWithDefault image={image} width="32" hight="32" className="rounded-circle me-2"/>
+            <ProfileImageWithDefault image={image} width="32" height="32" className="rounded-circle me-2"/>
             <div className="flex-fill">
                 <textarea
                     className={textAreaClass}
