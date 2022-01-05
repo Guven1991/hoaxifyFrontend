@@ -10,12 +10,12 @@ const HomePage = () => {
         <div className="container">
             <div className="row">
                 <div className="col">
-                    {isLoggedIn &&
-                    <div className="mb-1">
-                        <HoaxSubmit />
-                    </div>
-                    }
-                    <HoaxFeed />
+                    {isLoggedIn && (
+                        <div className="mb-1">
+                            <HoaxSubmit/>
+                        </div>
+                    )}
+                    <HoaxFeed/>
                 </div>
                 <div className="col">
                     <UserList/>
