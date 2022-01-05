@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {getHoaxes, getNewHoaxCount, getOldHoaxes} from "../api/apiCalls";
+import {getHoaxes, getNewHoaxCount, getNewHoaxes, getOldHoaxes} from "../api/apiCalls";
 import {useTranslation} from "react-i18next";
 import HoaxView from "./HoaxView";
 import {useApiProgress} from "../shared/ApiProgress";
@@ -25,18 +25,21 @@ const HoaxFeed = () => {
     const oldHoaxPath = username ? `/api/1.0/users/${username}/hoaxes/${lastHoaxId}` : `/api/1.0/hoaxes/${lastHoaxId}`;
     const loadOldHoaxesProgress = useApiProgress('get', oldHoaxPath, true);
 
+    const newHoaxPath = username ? `/api/1.0/users/${username}/hoaxes/${firstHoaxId}?direction=after`
+        : `/api/1.0/hoaxes/${firstHoaxId}?direction=after`;
+
+    const loadNewHoaxesProgress = useApiProgress('get', newHoaxPath, true);
+
     useEffect(() => {
         const getCount = async () => {
-            const response = await getNewHoaxCount(firstHoaxId);
+            const response = await getNewHoaxCount(firstHoaxId, username);
             setNewHoaxCount(response.data.count);
         };
-        let looper = setInterval(() => {
-            getCount();
-        }, 5000);
+        let looper = setInterval(getCount, 5000);
         return function cleanup() {
             clearInterval(looper);
         };
-    }, [firstHoaxId]);
+    }, [firstHoaxId, username]);
 
     useEffect(() => {
         const loadHoaxes = async (page) => {
@@ -58,7 +61,16 @@ const HoaxFeed = () => {
             ...response.data,
             content: [...previousHoaxPage.content, ...response.data.content]
         }));
-    }
+    };
+
+    const loadNewHoaxes = async () => {
+        const response = await getNewHoaxes(firstHoaxId, username);
+        setHoaxPage(previousHoaxPage => ({
+            ...previousHoaxPage,
+            content: [...response.data, ...previousHoaxPage.content ]
+        }));
+        setNewHoaxCount(0);
+    };
 
     const {content, last} = hoaxPage;
     if (content.length === 0) {
@@ -68,7 +80,14 @@ const HoaxFeed = () => {
 
     return (
         <div>
-            {newHoaxCount > 0 && (<div className="alert alert-secondary mb-1 text-center">{t('There are new hoaxes')}</div>
+            {newHoaxCount > 0 && (
+                <div
+                    className="alert alert-secondary mb-1 text-center"
+                    style={{cursor: loadNewHoaxesProgress ? 'not-allowed' : 'pointer'}}
+                    onClick={loadNewHoaxesProgress ? () => {} : loadNewHoaxes}
+                >
+                    {loadNewHoaxesProgress ? <Spinner/> : t('There are new hoaxes')}
+                </div>
             )}
             {content.map(hoax => {
                 return <HoaxView key={hoax.id} hoax={hoax}/>;
@@ -77,8 +96,7 @@ const HoaxFeed = () => {
                 <div
                     className="alert alert-secondary text-center"
                     style={{cursor: loadOldHoaxesProgress ? 'not-allowed' : 'pointer'}}
-                    onClick={loadOldHoaxesProgress ? () => {
-                    } : () => loadOldHoaxes()}>
+                    onClick={loadOldHoaxesProgress ? () => {} : loadOldHoaxes}>
                     {loadOldHoaxesProgress ? <Spinner/> : t('Load old hoaxes')}
                 </div>
             )}
