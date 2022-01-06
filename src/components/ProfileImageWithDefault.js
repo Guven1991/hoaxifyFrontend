@@ -8,14 +8,15 @@ const ProfileImageWithDefault = (props) => {
 
     let imageSource = defaultPicture;
     if (image) {
-        imageSource = 'images/' + image;
+        imageSource = 'images/profile/' + image;
     }
     return (
         <img
             alt={`Profile`}
-            src={tempimage || imageSource} {...props}
+            src={tempimage || imageSource}
+            {...props}
             onError={(event) => {
-                event.target.src = defaultPicture
+                event.target.src = defaultPicture;
             }}
         />
     );
