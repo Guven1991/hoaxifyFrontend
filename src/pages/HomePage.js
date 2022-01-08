@@ -15,10 +15,10 @@ const HomePage = () => {
                             <HoaxSubmit/>
                         </div>
                     )}
-                    <HoaxFeed/>
+                    <HoaxFeed />
                 </div>
                 <div className="col">
-                    <UserList/>
+                    <UserList />
                 </div>
             </div>
         </div>
