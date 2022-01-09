@@ -31,6 +31,7 @@ const configureStore = () => {
     setAuthorizationHeader(initialState);
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
     const store = createStore(authReducer, initialState, composeEnhancers( applyMiddleware(thunk)));
+
     store.subscribe(() => {
         updateStateInStorage(store.getState());
         setAuthorizationHeader(store.getState());
