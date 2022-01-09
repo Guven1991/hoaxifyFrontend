@@ -36,6 +36,7 @@ const TopBar = (props) => {
     };
 
     const dispatch = useDispatch();
+
     const onLogoutSuccess = () => {
         dispatch(logoutSuccess());
     }
